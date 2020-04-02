@@ -22,6 +22,7 @@ from uuunet.training.network_training.nnUNetTrainer import nnUNetTrainer
 from uuunet.training.network_training.nnUNetTrainerCascadeFullRes import nnUNetTrainerCascadeFullRes
 
 from uuunet.MAGIC import *
+from uuunet.resnet import *
 import torch
 
 import os
@@ -36,7 +37,7 @@ def modify_plans_2d():
     with open(path, "rb") as f:
         plan = pickle.load(f)
     plan["plans_per_stage"][0]['patch_size'] = [256, 256]
-    plan["plans_per_stage"][0]['batch_size'] = 16
+    plan["plans_per_stage"][0]['batch_size'] = 32
     with open(path, "wb") as f:
         pickle.dump(plan, f)
     ## CT
@@ -44,7 +45,7 @@ def modify_plans_2d():
     with open(path, "rb") as f:
         plan = pickle.load(f)
     plan["plans_per_stage"][0]['patch_size'] = [512, 512]
-    plan["plans_per_stage"][0]['batch_size'] = 16
+    plan["plans_per_stage"][0]['batch_size'] = 8
     with open(path, "wb") as f:
         pickle.dump(plan, f)
 
@@ -73,7 +74,7 @@ def backup(logdir):
     time_stamp = time.strftime("%Y-%m-%d_%H-%M-%S")
     path = os.path.join(logdir, "backup", time_stamp)
     os.makedirs(path, exist_ok=True)
-    files = ['run2.sh', 'uuunet/MAGIC.py', 'uuunet/run/run_training.py', 'uuunet/paths.py']
+    files = ['run2.sh', 'uuunet/MAGIC.py', 'uuunet/run/run_training.py', 'uuunet/paths.py', 'uuunet/resnet.py']
     for fro in files:
         to = os.path.join(path, os.path.basename(fro))
         shutil.copy(fro, to)
@@ -156,8 +157,9 @@ if __name__ == "__main__":
     #  the magic to merge two trainer.
     
 
-    #network = TriNet()
     network = XNet()
+    #network = YNet()
+    #network = DANet()
     network.cuda()
 
     optimizer = torch.optim.AdamW(network.parameters(), lr=1e-4, weight_decay=1e-5)

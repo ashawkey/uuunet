@@ -4,8 +4,8 @@ import os
 base = "pred_MR"
 
 files = os.listdir(base)
-os.makedirs(os.path.join(base, "InPhase"))
-os.makedirs(os.path.join(base, "OutPhase"))
+os.makedirs(os.path.join(base, "InPhase"), exist_ok=True)
+os.makedirs(os.path.join(base, "OutPhase"), exist_ok=True)
         
 for f in files:
     if "InPhase" in f:

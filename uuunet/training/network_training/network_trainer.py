@@ -581,6 +581,7 @@ class NetworkTrainer(object):
         data = data_dict['data']
         target = data_dict['target']
         
+        ### hard code to modify label
         if modality == 0:
             target[target==63] = 1
             target[target==126] = 2
@@ -627,6 +628,16 @@ class NetworkTrainer(object):
         """
 
         del data
+
+        ### Same head for mr and ct
+        if modality == 1 and output.shape[1] > 2:
+            B, C, H, W = output.shape
+            output_liver = torch.zeros(B, 2, H, W).to(output.device)
+            output_liver[:, 0] = output[:,0] + output[:,2] + output[:,3] + output[:,4] # will this work?
+            output_liver[:, 1] = output[:,1]
+            #print(f"@@@ Sample output: {output[0,:,0,0]} --> {output_liver[0,:,0,0]}")
+            output = output_liver
+
         l = self.loss(output, target)
 
         if run_online_evaluation:

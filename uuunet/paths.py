@@ -56,7 +56,7 @@ except KeyError:
 try:
     # Here I use environment variables to set the folder. Environment variables allow me to use the same code on
     # different systems (and our compute cluster). You can replace this line with something like:
-    network_training_output_dir = "/home/tang/nnUNet/results_XNet_1111_step"
+    network_training_output_dir = "/home/tang/nnUNet/results_YNet"
     #network_training_output_dir = os.path.join(os.environ['RESULTS_FOLDER'], my_output_identifier)
     maybe_mkdir_p(network_training_output_dir)
 except KeyError:
