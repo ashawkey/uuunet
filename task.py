@@ -2,6 +2,7 @@ import SimpleITK as sitk
 import numpy as np
 import cv2
 import os
+import shutil
 import glob
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
@@ -11,7 +12,6 @@ from skimage.measure import label
 from scipy.ndimage.morphology import binary_fill_holes
 
 OUTDIR = "submit"
-os.makedirs(OUTDIR, exist_ok=True)
 
 def largest_CC(mask):
     labels = label(mask)
@@ -40,7 +40,7 @@ def post_process_mr_abdom(mask):
         mask_organ = mask == i
         mask_organ = largest_CC(mask_organ)
         mask_organ = binary_fill_holes(mask_organ).astype(np.uint8)
-        res += mask_organ * i
+        res += mask_organ.astype(np.uint8) * i
     res[res==1] = 63
     res[res==2] = 126
     res[res==3] = 189
@@ -72,6 +72,10 @@ def view_batch(imgs, lbls, labels=['image', 'label'], stack=False):
     plt.show()
 
 def prepare_folders():
+    if os.path.exists(OUTDIR):
+        shutil.rmtree(OUTDIR)
+    else:
+        os.makedirs(OUTDIR)
     # create empty templates
     for i in range(1,41):
         os.makedirs(f"{OUTDIR}/Task1/CT/{i}/Results/", exist_ok=True)
@@ -245,4 +249,3 @@ if __name__ == "__main__":
     task3() # MR liver
     #task4() # CT & MR Abdom
     task5() # MR Abdom
-

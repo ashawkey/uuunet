@@ -37,7 +37,7 @@ def modify_plans_2d():
     with open(path, "rb") as f:
         plan = pickle.load(f)
     plan["plans_per_stage"][0]['patch_size'] = [256, 256]
-    plan["plans_per_stage"][0]['batch_size'] = 32
+    plan["plans_per_stage"][0]['batch_size'] = 16
     with open(path, "wb") as f:
         pickle.dump(plan, f)
     ## CT
@@ -45,7 +45,7 @@ def modify_plans_2d():
     with open(path, "rb") as f:
         plan = pickle.load(f)
     plan["plans_per_stage"][0]['patch_size'] = [512, 512]
-    plan["plans_per_stage"][0]['batch_size'] = 8
+    plan["plans_per_stage"][0]['batch_size'] = 4
     with open(path, "wb") as f:
         pickle.dump(plan, f)
 
@@ -161,20 +161,24 @@ if __name__ == "__main__":
     #network = YNet()
     #network = DANet()
     network.cuda()
+    
+    # how about seperated optimizer?
+    optimizer0 = torch.optim.AdamW(network.parameters(), lr=1e-4, weight_decay=1e-5)
+    lr_scheduler0 = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer0, mode='min', factor=0.2, patience=5)
 
-    optimizer = torch.optim.AdamW(network.parameters(), lr=1e-4, weight_decay=1e-5)
-    lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.2, patience=5)
+    optimizer1 = torch.optim.AdamW(network.parameters(), lr=1e-4, weight_decay=1e-5)
+    lr_scheduler1 = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer1, mode='min', factor=0.2, patience=5)
     
     writer = tensorboardX.SummaryWriter(os.path.join(network_training_output_dir, "run")) # path?
 
     trainer0.network = network
-    trainer0.optimizer = optimizer
-    trainer0.lr_scheduler = lr_scheduler
+    trainer0.optimizer = optimizer0
+    trainer0.lr_scheduler = lr_scheduler0
     trainer0.writer = writer
 
     trainer1.network = network
-    trainer1.optimizer = optimizer
-    trainer1.lr_scheduler = lr_scheduler
+    trainer1.optimizer = optimizer1
+    trainer1.lr_scheduler = lr_scheduler1
     trainer1.writer = writer
     
     #######################################

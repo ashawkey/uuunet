@@ -227,17 +227,26 @@ class XNet(SegmentationNetwork):
         ### CT seg head
         #self.head1 = nn.Conv2d(decoder_channels[-1], 2, 1, 1, 0, bias=False)
 
+        self.cnt = 0
+
     def forward(self, x, modality):
         size = x.shape[2:]
         if modality == 0:
+            _x_ = x.detach().cpu().numpy() # [B, 1, 256, 256]
             x0 = self.block00(x)
             x1 = self.block01(x0)
             x2 = self.block02(x1)
             x3 = self.block03(x2)
             x4 = self.block04(x3)
             x = self.decoder(x4)
+            _f_ = x.detach().cpu().numpy() # [B, 512, 32, 32]
             x = self.head(x)
+            _y_ = x.detach().cpu().numpy().argmax(1) # [B, 1, 256, 256]
+            print(self.cnt, _x_.shape, _f_.shape, _y_.shape)
+            torch.save({"x":_x_, "f":_f_, "y":_y_}, f'{modality}_{self.cnt}.bin')
+            self.cnt += 1
         else:
+            _x_ = x.detach().cpu().numpy() # [B, 1, 256, 256]
             x0 = self.block10(x)
             x1 = self.block11(x0)
             x2 = self.block12(x1)
@@ -245,7 +254,12 @@ class XNet(SegmentationNetwork):
             x4 = self.block14(x3)
             x5 = self.block15(x4)
             x = self.decoder(x5)
+            _f_ = x.detach().cpu().numpy() # [B, 512, 32, 32]
             x = self.head(x)            
+            _y_ = x.detach().cpu().numpy().argmax(1) # [B, 1, 256, 256]
+            print(self.cnt, _x_.shape, _f_.shape, _y_.shape)
+            torch.save({"x":_x_, "f":_f_, "y":_y_}, f'{modality}_{self.cnt}.bin')
+            self.cnt += 1
         x = F.interpolate(x, size=size, mode='bilinear')
         return x
 

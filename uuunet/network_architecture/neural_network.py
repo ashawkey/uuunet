@@ -79,7 +79,7 @@ class SegmentationNetwork(NeuralNetwork):
         if self.modality == 0:
             self.num_classes = 5
         else:
-            self.num_classes = 2
+            self.num_classes = 5 # 2
 
         print("@@@ [predict_3D]", "mirroring", do_mirroring, "mirror_axes", mirror_axes, "modality", self.modality, "num_classes", self.num_classes)
         assert self.get_device() != "cpu", "CPU not implemented"
